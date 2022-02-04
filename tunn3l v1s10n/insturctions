@@ -1,0 +1,50 @@
+understanding bmp:
+https://medium.com/sysf/bits-to-bitmaps-a-simple-walkthrough-of-bmp-image-format-765dc6857393
+
+
+We try to realize what type of file we are dealing with as always.
+If we do file tunn3l_v1s10n we get that it is a data type.
+If we try to use exiftool tunn3l_v1s10n we can see it is a BMP file.
+We can also the BM in the header of the hex code.
+view hex: xxd tunn3l_v1s10n > hex_dump_of_file.txt
+
+In the exiftool we can see this part:
+Image Width                     : 1134
+Image Height                    : 306
+
+which is quite an odd size for an image. we will get back to it later.
+
+If we try to use to use kaita struct visualizer (very good!): ksv tunn3l_v1s10n.bmp ~/Shared/kaitai_struct_formats-master/image/bmp.ksy
+- see the printscreen image
+
+
+We can see that len_header has the value of 53434, or ba d0 in hex. This doesn't make sense, according to the spec the header size should be 40. ofs_bitmap has the same value of 53434, sending us far far away to look for the image data. The correct value should probably be 0x36 (54 in hex), which is right after the file_hdr (14 bytes) and dib_info (40 bytes).
+
+So we change the len_header and the ofs_bitmap which are the 2 bad0.
+The first the is the ofs_bitmap which we change to 3600(54), the second is the len_header which we change to 2800(40).
+
+We now recompile with: xxd -r editedHex.txt editedOutput
+
+And look at the first line we changed: xxd -g 1 editedOutput | head -1
+00000000: 42 4d 8e 26 2c 00 00 00 00 00 36 00 00 00 28 00  BM.&,.....6...(.
+
+If we try to view the photo now we can see part of it.
+Now view the new edited file: ksv editedOutput ~/Shared/kaitai_struct_formats-master/image/bmp.ksy
+We can now see a lot more info. Including the bits per pixel.
+
+We can see the size the file size (len_file) is 2893454 bytes, and without the 54 bytes for the header(s), we get 2893400 bytes of body.
+Given that bits_per_pixel = 24, byte = 8 bits, meaning there are 3 bytes per pixel,
+this should should account for around 2893400 / 3 =~ 964466 pixels (since we have to add some scanline padding as explained in the spec).
+However, we only have 1134 * 306 = 347004 pixels according to the dimensions.
+
+We can try to adjust the dimensions so that all the data is accounted for.
+Adjusting the width seems to distort the image, so we should probably stick to adjusting the height.
+964466 / 1134 gives us ~850 so let's try that as the height: change the 3201 to 5203. recompile as we did before.
+
+and it seems to work
+
+
+
+a great solution:
+
+https://github.com/Dvd848/CTFs/blob/master/2021_picoCTF/tunn3l_v1s10n.md

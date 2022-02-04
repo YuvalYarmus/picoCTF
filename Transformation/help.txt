@@ -1,0 +1,18 @@
+''.join([chr((ord(flag[i]) << 8) + ord(flag[i + 1])) for i in range(0, len(flag), 2)])
+
+
+we can see the function takes a string and then for every second character,
+it took the letter's ascci number, shifted the ascci number by 8 bits to the left,
+and then revaluated the ascci character.
+It then added the ascci number of the next character.
+
+
+x << y
+
+Returns x with the bits shifted to the left by y places (and new bits on the right-hand-side are zeros).
+This is the same as multiplying x by 2**y.
+
+x >> y
+
+Returns x with the bits shifted to the right by y places. 
+This is the same as dividing x by 2**y.

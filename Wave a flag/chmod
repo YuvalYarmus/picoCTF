@@ -1,0 +1,22 @@
+chmod +x on a file (your script) only means, that you'll make it executable. 
+Right click on your script and chose Properties -> Permissions -> Allow executing file as program, leaves you with the exact same result as the command in terminal.
+
+If a file you want to change permissions on is located within the systems directory you may need to be root, like so: (be careful, while using sudo command)
+
+sudo chmod +x /usr/share/testfolder/aFile 
+
+Also it is not clear, what exactly you want to archive here. Please edit your question and give some more detail on the actual problem!
+
+You can also refer to this question, for more information: chmod u+x' versus 'chmod +x
+
+
+
+// Change the permissions of a file for all users via Mac terminal
+
+// CD into the exe folder where your file is stored and run:
+chmod a+x example.txt 
+
+// chmod: change mode (permissions) of a file.
+// a+x: for all (a) users, add (+) the execute (x) permission.
+
+

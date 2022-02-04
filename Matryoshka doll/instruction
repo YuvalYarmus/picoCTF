@@ -1,0 +1,3 @@
+go to: http://manpages.org/binwalk
+
+than see how to recursively open files with binwalk (-M) and extract automatically (-e)

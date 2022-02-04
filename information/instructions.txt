@@ -1,0 +1,27 @@
+Whenever I get an image file:
+I go and run file (to make sure it's an image),
+binwalk (to see if there are hidden files),
+strings and usually I pair that with grep and lastly I check the image in a hexeditor, just to check the header and such.
+
+to dump the hex into a file:
+xxd file > hex_dump_of_file.txt
+or:
+hexdump -C [file]
+
+we can also try:
+Using exiftool to look at the exif data of the image in our terminal we see some interesting data under "License".
+i.e exiftool cat.jpg
+
+
+to decode the license from base64 we can use:
+echo "cGljb0NURnt0aGVfbTN0YWRhdGFfMXNfbW9kaWZpZWR9" | base64 --decode
+or just: echo cGljb0NURnt0aGVfbTN0YWRhdGFfMXNfbW9kaWZpZWR9 | base64 -d
+
+
+
+
+in case you go for the hex solution notice the base64 will be here:
+<cc:license r  df:resource='cGljb0NURnt0aGVfbTN0YWRhdGFfMXNfbW9kaWZpZWR9'/>
+
+
+the answer is: picoCTF{the_m3tadata_1s_modified}

@@ -1,0 +1,113 @@
+after nc mercury.picoctf.net 41934,
+we get right off the bat:
+
+******************Welcome to our OTP implementation!******************
+This is the encrypted flag!
+0345376e1e5406691d5c076c4050046e4000036a1a005c6b1904531d3941055d
+
+What data would you like to encrypt?
+
+----------------------------------------------------------------
+
+Encrypted flag: 0345376e1e5406691d5c076c4050046e4000036a1a005c6b1904531d3941055d, length: 64
+
+*note*: we may be able to make the one time pad a multiple time pad by restarting the connection.
+Each time the pad is generated from the same file so by restarting the connection we would get
+the same pad.
+
+['a: 3d', 'b: 3e', 'c: 3f', 'd: 38', 'e: 39']
+
+
+a bit more info (check each letter from a to e 3 times):
+[['a:3d', 'a:19', 'a:05'], ['b:3e', 'b:1a', 'b:06'], ['c:3f', 'c:1b', 'c:07'], ['d:38', 'd:1c', 'd:00'], ['e:39', 'e:1d', 'e:01']]
+
+[['a:61', 'a:25', 'a:5'], ['b:62', 'b:26', 'b:6'], ['c:63', 'c:27', 'c:7'], ['d:56', 'd:28', 'd:0'], ['e:57', 'e:29', 'e:1']]
+
+
+We see that each letter results in 2 hex letters.
+Porbably means the decrypted flag would be of length 32.
+
+testing the startup a bit:
+flag = "hey"
+key = "123"
+result = list(map(lambda p, k: "{:02x}".format(ord(p) ^ int(k)), flag, key))
+result
+['69', '67', '7a']
+"".join(result)
+'69677a'
+
+-- we can easily see that a 3 letter flag ("hey") becomes a 6 letter.
+
+
+notice in the encrypt function that:
+start = key_location
+key_location = stop
+return key_location
+
+and the encrypt function is ran that way: 
+c = encrypt(c)
+
+Meaning each time start is equal to stop of the previous run.
+
+The clue is making the one time pad a two time pad.
+The one time pad is the key, which is derived of the key file,
+based on a start point and a stop point which are the start and stop variables.
+
+So the way to make a one time a two time pad to make start and stop the same twice.
+i.e how to make current_loop_stop = start = previous_loop_stop
+
+The way to do it:
+if stop >= KEY_LEN: 
+		stop = stop % KEY_LEN # if stop == KEY_LEN then stop = 0
+		key = kf[start:] + kf[:stop] # key = [start, 0]
+	else:
+		key = kf[start:stop]
+	key_location = stop # we want this to be 0
+
+
+The question now is how to make stop = KEY_LEN?
+Well the first time we derive the key is in the startup function with 0 as the parameter,
+so start is set to key_location which is 0.
+
+stop = key_location + len(flag), and we deduced that len(flag) is 32.
+
+So in the beginning start is 0 and stop is 32.
+
+In next run after startup (where we get to send data):
+Start is always set to the previous key_location (stop) so it would be 32.
+Stop = stop = key_location + len(what_we_send)
+
+KEY_LEN IS 5000 so if the sent message would be 5000 - 32 stop would equal to KEY_LEN,
+and then set to 0.
+
+Meaning we will have a cycle of:
+start:0, stop:32
+start:32, stop: 0
+now we can sent a 32 long string and the key in the next cycle would be derived of:
+start:0, stop: 32
+
+
+My note from the otp.py file:
+
+# the encryption here seems to be xoring the ord of a character from the flag
+# with the matching character from the key
+# remember that for each a, b the following process swaps a and b:
+# before: a = a, b = b --- *note*: a^b=b^a (essentialy the same)
+# a = a^b --> the difference between a and b
+# b = b^a --> the difference between b and (the difference between a and b) (which is a)
+# a = a^b --> the difference between (the difference between of a and b) and a (which is b)
+# after: a = b, b = a
+# meaning (a^b)^b = a, so similarly:
+# (a^b)^(a^c) = a -->
+# e_flag = key ^ flag
+# e_msg = key ^ msg
+# key = e_flag ^ e_msg
+# now we have to key, so all we have to do to get the flag is:
+# flag = key ^ e_flag (a^b^b = a where a=flag, b=key, a^b=e_flag)
+
+
+
+
+
+
+

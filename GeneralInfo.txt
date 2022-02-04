@@ -1,0 +1,37 @@
+ -- from 'information' task
+ Whenever I get an image file (or almost any file really):
+I go and run file (to make sure it's an image), i.e: file [file]
+binwalk (to see if there are hidden files), if there are hidden files use: binwalk -D='.*' [file], or: binwalk -e -M dolls.jpg to do it recursively
+strings and usually I pair that with grep and lastly I check the image in a hexeditor, just to check the header and such,
+using exiftool to look at the exif data of the image in our terminal: i.e exiftool cat.jpg
+
+to dump the hex into a file:
+xxd file > hex_dump_of_file.txt
+or:
+hexdump -C [file]
+
+to decode the license from base64 we can use:
+echo "cGljb0NURnt0aGVfbTN0YWRhdGFfMXNfbW9kaWZpZWR9" | base64 --decode
+or just: echo cGljb0NURnt0aGVfbTN0YWRhdGFfMXNfbW9kaWZpZWR9 | base64 -d
+
+
+
+x << y
+Returns x with the bits shifted to the left by y places (and new bits on the right-hand-side are zeros).
+This is the same as multiplying x by 2**y.
+
+x >> y
+Returns x with the bits shifted to the right by y places. 
+This is the same as dividing x by 2**y.
+
+***  the shifts aren't circular: if y>log2(x) --> x >> y = 0
+
+-- from the 'stonks' task
+the pwn library allows one to use nc in a script, recieve lines and send lines.
+
+The %x allows us to traverse up a stack in C.
+
+
+linux bash:
+The >> appends to a file or creates the file if it doesn't exist.
+The > overwrites the file if it exists or creates it if it doesn't exist.

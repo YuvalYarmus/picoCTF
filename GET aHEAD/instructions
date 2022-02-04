@@ -1,0 +1,14 @@
+we are given a link: http://mercury.picoctf.net:45028/
+
+We have have a clue that says that maybe there are more 2 choices
+Another clue that says to check out tools like burpsuite 
+And we have got the name of the challenge (GET aHEAD) which are both types of http requests.
+
+We can see that to get either a blue or red color that php sends either a GET or POST requests. 
+
+We will try to send a HEAD request to the website using POSTMAN.
+
+walla - we got the answer in the header.
+
+key - flag
+value - picoCTF{r3j3ct_th3_du4l1ty_775f2530}
